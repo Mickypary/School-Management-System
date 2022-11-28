@@ -47,7 +47,7 @@
 							<?php } elseif ($getExam['type_id'] == 3) { ?>
 								
 								<th>Total</th>
-								<th>Mid</th>
+								<!-- <th>Mid</th> -->
 								<th>Grade</th>
 								<th>Point</th>
 							<?php } ?>

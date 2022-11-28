@@ -4,6 +4,8 @@ $widget = (is_superadmin_loggedin() ? 3 : 4);
 $branchID = $student['branch_id'];
 $getParent = $this->student_model->get('parent', array('id' => $student['parent_id']), true);
 $previous_details = json_decode($student['previous_details'], true);
+
+
 ?>
 <div class="row appear-animation" data-appear-animation="<?=$global_config['animations'] ?>" data-appear-animation-delay="100">
 	<div class="col-md-12 mb-lg">
@@ -597,12 +599,16 @@ $previous_details = json_decode($student['previous_details'], true);
 				<div id="exam_result" class="accordion-body collapse">
 					<div class="panel-body">
 						<?php 
+
 						$studentID = $student['id'];
 						$this->db->where('class_id', $student['class_id']);
 						$this->db->where('section_id', $student['section_id']);
 						$this->db->where('session_id', get_session_id());
 						$this->db->group_by('exam_id');
 						$variable = $this->db->get('timetable_exam')->result_array();
+						
+
+
 						foreach ($variable as  $erow) {
 							$examID = $erow['exam_id'];
 						?>
@@ -613,11 +619,15 @@ $previous_details = json_decode($student['previous_details'], true);
 					            <div class="panel-body">
 									<?php
 									$result = $this->exam_model->getStudentReportCard($studentID, $examID, get_session_id());
+									$results = $result['exam'];
+									// print_r($result['exam']);
+
 									if (!empty($result['exam'])) {
+
 									$getMarksList = $result['exam'];
 									$getExam = $this->db->where(array('id' => $examID))->get('exam')->row_array();
 									$getSchool = $this->db->where(array('id' => $getExam['branch_id']))->get('branch')->row_array();
-									$schoolYear = get_type_name_by_id('schoolyear', get_session_id(), 'school_year');
+									$schoolYear = get_type_name_by_id('schoolyear', get_session_id(), 'school_year'); 
 									?>
 									<div class="table-responsive">
 										<table class="table table-condensed table-bordered mt-sm">
@@ -653,11 +663,13 @@ $previous_details = json_decode($student['previous_details'], true);
 											?>
 												<tr>
 													<td valign="middle" width="35%"><?=$row['subject_name']?></td>
-												<?php 
+												<?php
+
 												$total_obtain_marks = 0;
 												$total_full_marks = 0;
 												$fullMarkDistribution = json_decode($row['mark_distribution'], true);
 												$obtainedMark = json_decode($row['get_mark'], true);
+
 												foreach ($fullMarkDistribution as $i => $val) {
 													$obtained_mark = floatval($obtainedMark[$i]);
 													$fullMark = floatval($val['full_mark']);
@@ -665,11 +677,10 @@ $previous_details = json_decode($student['previous_details'], true);
 													if ($obtained_mark < $passMark) {
 														$result_status = 0;
 													}
-
 													$total_obtain_marks += $obtained_mark;
 													$obtained = $row['get_abs'] == 'on' ? 'Absent' : $obtained_mark;
 													$total_full_marks += $fullMark;
-													?>
+												?>
 												<?php if ($getExam['type_id'] == 1 || $getExam['type_id'] == 3){ ?>
 													<td valign="middle">
 														<?php 
@@ -680,7 +691,7 @@ $previous_details = json_decode($student['previous_details'], true);
 															}
 														?>
 													</td>
-												<?php } if ($getExam['type_id'] == 2){ ?>
+													<?php } if ($getExam['type_id'] == 2){ ?>
 													<td valign="middle">
 														<?php 
 															if ($row['get_abs'] == 'on') {
@@ -693,11 +704,13 @@ $previous_details = json_decode($student['previous_details'], true);
 														?>
 													</td>
 												<?php } ?>
+
 												<?php
 												}
 												$grand_obtain_marks += $total_obtain_marks;
 												$grand_full_marks += $total_full_marks;
 												?>
+
 												<?php if($getExam['type_id'] == 1 || $getExam['type_id'] == 3) { ?>
 													<td valign="middle"><?=$total_obtain_marks . "/" . $total_full_marks?></td>
 												<?php } if($getExam['type_id'] == 2) { 
@@ -718,6 +731,7 @@ $previous_details = json_decode($student['previous_details'], true);
 												<?php } ?>
 												</tr>
 											<?php } ?>
+
 											<?php if ($getExam['type_id'] == 1 || $getExam['type_id'] == 3) { ?>
 												<tr class="text-weight-semibold">
 													<td valign="top" >GRAND TOTAL :</td>
@@ -727,8 +741,8 @@ $previous_details = json_decode($student['previous_details'], true);
 													<td valign="top" >GRAND TOTAL IN WORDS :</td>
 													<td valign="top" colspan="<?=$colspan?>">
 														<?php
-														$f = new NumberFormatter("en", NumberFormatter::SPELLOUT);
-														echo ucwords($f->format($grand_obtain_marks));
+														// $f = new NumberFormatter("en", NumberFormatter::SPELLOUT);
+														echo ucwords($grand_obtain_marks);
 														?>
 													</td>
 												</tr>
@@ -748,6 +762,10 @@ $previous_details = json_decode($student['previous_details'], true);
 													<td valign="top" colspan="<?=$colspan?>"><?=$result_status == 0 ? 'Fail' : 'Pass'; ?></td>
 												</tr>
 											<?php } ?>
+
+											
+
+												
 											</tbody>
 										</table>
 							        </div>

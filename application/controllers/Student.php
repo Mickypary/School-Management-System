@@ -382,14 +382,22 @@ class Student extends Admin_Controller
         if (!get_permission('student', 'is_edit')) {
             access_denied();
         }
+
         $this->load->model('fees_model');
         $this->load->model('exam_model');
         $getStudent = $this->student_model->getSingleStudent($id);
+        
+        // echo "God is good";
+        // print_r($getStudent);
+        // exit;
+
         if (isset($_POST['update'])) {
             $this->session->set_flashdata('profile_tab', 1);
+
             $this->data['branch_id'] = $this->application_model->get_branch_id();
             $this->student_validation();
             $this->form_validation->set_rules('parent_id', translate('guardian'), 'required');
+
             if ($this->form_validation->run() == true) {
                 $post = $this->input->post();
                 //save all student information in the database file
@@ -402,8 +410,10 @@ class Student extends Admin_Controller
                     'session_id' => $this->input->post('year_id'),
                     'branch_id' => $this->data['branch_id'],
                 );
+
                 $this->db->where('student_id', $id);
                 $this->db->update('enroll', $arrayEnroll);
+
 
                 // handle custom fields data
                 $class_slug = $this->router->fetch_class();
